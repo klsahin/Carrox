@@ -111,7 +111,6 @@ while running:
                     carrots_in_basket.append(mainCarrot)
                     basket.update(len(carrots_in_basket))  # Update basket with new carrot count
                     flyToBasket()
-<<<<<<< Updated upstream
                     
                 elif shakeCounter < 4 and shakeCounter % 2 == 0:
                     shakeCounter += 1
@@ -124,17 +123,6 @@ while running:
                     print("Shaking carrot...")
                     mainCarrot.shake(left=False, right=True, screen=screen)
 
-=======
-
-                elif shakeCounter < 4 and shakeCounter % 2 == 0:
-                    shakeCounter += 1
-                    print("Shaking carrot...")
-                    mainCarrot.shake(left=True, right=False, screen=screen)  # Example shake left
-                elif shakeCounter < 4 and shakeCounter % 2 == 1:
-                    shakeCounter += 1
-                    print("Shaking carrot...")
-                    mainCarrot.shake(left=False, right=True, screen=screen)  
->>>>>>> Stashed changes
 
     # Draw background first
     screen.blit(background.image, background.position)

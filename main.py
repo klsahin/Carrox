@@ -100,6 +100,7 @@ while running:
                         basket.update(len(carrots_in_basket))
                         mainCarrot.visible = False
                         flyToBasket()
+                        
                         # --- SCROLL LOGIC START (REVERSED) ---
                         scroll_dx = carrot_xs[1] - carrot_xs[0]  # Distance between carrots
                         background.scroll(-scroll_dx)  # Scroll to the right

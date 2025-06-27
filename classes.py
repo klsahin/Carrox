@@ -37,7 +37,7 @@ class Carrot:
         self.y = y
         self.width = width
         self.height = height
-        self.position = [x, y]
+        self.position = [self.x, self.y]
         self.size = [width, height]
         self.index = index
         self.path = f'assets/carrot{self.index+1}.png'
@@ -54,12 +54,14 @@ class Carrot:
         original_path = self.path
         original_size = self.size
         original_position = self.position
-
         # Hide original carrot during shake
         self.visible = False
 
         self.size = [self.width * 2, self.height * 1.1]  # Reduce size for shake effect
-        self.position = [self.x - self.width // 2, self.y - self.height // 10]
+        #self.position = [self.x - self.width // 2, self.y - self.height // 10]
+        self.position = [self.position[0] - self.width // 2, self.position[1] - self.height // 10]
+        print(f"Shaking carrot at {self.position} with size {self.size}")
+
         shake_frames = [1, 2, 1]
         for i in shake_frames:
             # Redraw the whole scene

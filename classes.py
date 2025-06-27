@@ -47,29 +47,29 @@ class Carrot:
     def load_image(self):
         self.image = pygame.image.load(self.path).convert_alpha()
         self.image = pygame.transform.scale(self.image, self.size)
-        
-        
-            
-    def shake(self, left, right, screen): #left and right are bool ?
+
+
+
+    def shake(self, left, right, screen, background, carrotPits, carrots, basket):
         original_path = self.path
         original_size = self.size
         original_position = self.position
 
-        # hide original carrot ???
+        # Hide original carrot during shake
         self.visible = False
-        # self.load_image()  # Load the carrot image at the new size and position
-        # screen.blit(self.image, self.position)  # Draw the carrot at its new position
-        # pygame.display.flip()
 
-        self.position = [self.x*0.9 - 20, self.y * 0.8] 
-        self.size = [self.width * 2, self.height * 1.2]
+        shake_frames = [1, 2, 1]
+        for i in shake_frames:
+            # Redraw the whole scene
+            background.draw(screen)
+            for pit in carrotPits:
+                screen.blit(pit.image, pit.position)
+            for carrot in carrots:
+                if carrot.visible:
+                    screen.blit(carrot.image, carrot.position)
+            screen.blit(basket.image, basket.position)
 
-        
-        #self.visible = True
-
-        print("shaking")
-         # Shaking animation (draw directly to screen)
-        for i in [1,2,1]:
+            # Draw the shake frame in place of the original carrot
             if left:
                 self.path = f'assets/carrotShakes/carrotL{i}.png'
             elif right:
@@ -85,7 +85,7 @@ class Carrot:
         self.position = original_position
         self.visible = True
         self.load_image()
-        
+
     def flyToBasket(self):
         #fly to basket
         pass
@@ -114,8 +114,8 @@ class CarrotPit:
 
 class Basket():
     def __init__(self, x, y, width, height, index):
-        self.position = [x, y]
-        self.size = [width, height]
+        self.position = [x+10, y+70]
+        self.size = [width*0.9, height*0.9]
         self.image = None
         self.index = index
         self.imagePath = f'assets/{index}basket.png'

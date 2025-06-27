@@ -125,11 +125,11 @@ while running:
                     elif shakeCounter < 4 and shakeCounter % 2 == 0:
                         shakeCounter += 1
                         print("Shaking carrot...")
-                        mainCarrot.shake(left=True, right=False, screen=screen)  # Shake left
+                        mainCarrot.shake(left=True, right=False, screen=screen, background=background, carrotPits=carrotPits, carrots=carrots, basket=basket)  # Shake left
                     elif shakeCounter < 4 and shakeCounter % 2 == 1:
                         shakeCounter += 1
                         print("Shaking carrot...")
-                        mainCarrot.shake(left=False, right=True, screen=screen)
+                        mainCarrot.shake(left=False, right=True, screen=screen, background=background, carrotPits=carrotPits, carrots=carrots, basket=basket)
 
     # Draw background first
     background.draw(screen)

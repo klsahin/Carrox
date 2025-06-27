@@ -100,7 +100,7 @@ while running:
                         basket.update(len(carrots_in_basket))
                         mainCarrot.visible = False
                         flyToBasket()
-                        
+
                         # --- SCROLL LOGIC START (REVERSED) ---
                         scroll_dx = carrot_xs[1] - carrot_xs[0]  # Distance between carrots
                         background.scroll(-scroll_dx)  # Scroll to the right
@@ -109,17 +109,21 @@ while running:
                             carrot.position[0] += scroll_dx
                         for pit in carrotPits:
                             pit.position[0] += scroll_dx
+
                         # Remove rightmost carrot only, not the pit
                         carrots.pop(-1)
                         # Remove rightmost pit only if it is off the screen
                         if carrotPits[-1].position[0] > screen.get_width():
                             carrotPits.pop(-1)
+
                         # Add new random carrot and pit on the left
-                        new_x = carrot_xs[0] - scroll_dx
+                        new_x = carrot_xs[0] 
                         new_index = random.randint(0, 2)
                         new_carrot = Carrot(new_x, carrot_y, carrot_width, carrot_height, new_index)
                         new_carrot.load_image()
                         carrots.insert(0, new_carrot)
+
+
                         new_pit_x = new_x + (carrot_width - pit_width) // 2
                         new_pit = CarrotPit(new_pit_x, pit_y, pit_width, pit_height)
                         new_pit.load_image()

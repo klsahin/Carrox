@@ -108,9 +108,11 @@ while running:
                             carrot.position[0] += scroll_dx
                         for pit in carrotPits:
                             pit.position[0] += scroll_dx
-                        # Remove rightmost carrot and pit
+                        # Remove rightmost carrot only, not the pit
                         carrots.pop(-1)
-                        carrotPits.pop(-1)
+                        # Remove rightmost pit only if it is off the screen
+                        if carrotPits[-1].position[0] > screen.get_width():
+                            carrotPits.pop(-1)
                         # Add new random carrot and pit on the left
                         new_x = carrot_xs[0] - scroll_dx
                         new_index = random.randint(0, 2)
@@ -123,7 +125,7 @@ while running:
                         carrotPits.insert(0, new_pit)
                         # --- SCROLL LOGIC END (REVERSED) ---
 
-                    # shaking logic    
+                    # shaking logic
                     elif shakeCounter < 4 and shakeCounter % 2 == 0:
                         shakeCounter += 1
                         print("Shaking carrot...")

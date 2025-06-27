@@ -62,8 +62,6 @@ basket_target_height = ground_level - 100  #550 # Make basket sit on ground, adj
 basket_scale = basket_target_height / basket_orig_height
 basket_target_width = int(basket_orig_width * basket_scale) #423
 
-basket_img = pygame.image.load('assets/0basket.png').convert_alpha()
-basket_img = pygame.transform.scale(basket_img, (basket_target_width, basket_target_height))
 basket_x = 1194 - basket_target_width - 40  # 722 40px right margin
 basket_y = ground_level - basket_target_height - 100  # Sit on ground level
 

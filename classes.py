@@ -27,21 +27,47 @@ class Carrot:
         self.visible = True  # Add this line
 
     def load_image(self):
-        if self.image is None:
-            self.image = pygame.image.load(self.path).convert_alpha()
-            self.image = pygame.transform.scale(self.image, (self.width, self.height))
-        return self.image
+        self.image = pygame.image.load(self.path).convert_alpha()
+        self.image = pygame.transform.scale(self.image, self.size)
+        
+        
+            
+    def shake(self, left, right, screen): #left and right are bool ?
+        original_path = self.path
+        original_size = self.size
+        original_position = self.position
 
-    # def shake(self, left, right): #left and right are bool ?
-    #     if left:
-    #         #twist left
-    #         for i in range(10):
-    #             rotated = pygame.transform.rotate(self.image, i)  # Example rotation
-    #             screen.blit(rotated, self.position)  # Assuming 'screen' is defined globally
-    #     elif right:
-    #         #twist right
-    #         pass
+        # hide original carrot ???
+        self.visible = False
+        # self.load_image()  # Load the carrot image at the new size and position
+        # screen.blit(self.image, self.position)  # Draw the carrot at its new position
+        # pygame.display.flip()
 
+        self.position = [self.x*0.9 - 20, self.y * 0.8] 
+        self.size = [self.width * 2, self.height * 1.2]
+
+        
+        #self.visible = True
+
+        print("shaking")
+         # Shaking animation (draw directly to screen)
+        for i in [1,2,1]:
+            if left:
+                self.path = f'assets/carrotShakes/carrotL{i}.png'
+            elif right:
+                self.path = f'assets/carrotShakes/carrotR{i}.png'
+            self.load_image()
+            screen.blit(self.image, self.position)
+            pygame.display.flip()
+            pygame.time.wait(200)
+
+        # Restore carrot state
+        self.path = original_path
+        self.size = original_size
+        self.position = original_position
+        self.visible = True
+        self.load_image()
+        
     def flyToBasket(self):
         #fly to basket
         pass

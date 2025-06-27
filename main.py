@@ -61,8 +61,6 @@ basket_target_height = ground_level - 100  #550 # Make basket sit on ground, adj
 basket_scale = basket_target_height / basket_orig_height
 basket_target_width = int(basket_orig_width * basket_scale) #423
 
-basket_img = pygame.image.load('assets/0basket.png').convert_alpha()
-basket_img = pygame.transform.scale(basket_img, (basket_target_width, basket_target_height))
 basket_x = 1194 - basket_target_width - 40  # 722 40px right margin
 basket_y = ground_level - basket_target_height - 100  # Sit on ground level
 
@@ -80,17 +78,17 @@ print(f"Carrot positions: {carrot_xs}")
 print(f"Pit positions: {pit_xs}")
 print(f"Basket position: ({basket.position})")
 
-def shake(carrot, left, right):
-    if left:
-        for i in range(10):
-            rotated = pygame.transform.rotate(carrot.image, -i)  # incrementing left
-            screen.blit(rotated, carrot.position)
-            pygame.display.flip()  # Update the display while shaking
-    elif right:
-        for i in range(10):
-            rotated = pygame.transform.rotate(carrot.image, i)  # incrementing right
-            screen.blit(rotated, carrot.position)
-            pygame.display.flip()  # Update the display while shaking
+# def shake(carrot, left, right):
+#     if left:
+#         for i in range(10):
+#             rotated = pygame.transform.rotate(carrot.image, -i)  # incrementing left
+#             screen.blit(rotated, carrot.position)  
+#             pygame.display.flip()  # Update the display while shaking 
+#     elif right:
+#         for i in range(10):
+#             rotated = pygame.transform.rotate(carrot.image, i)  # incrementing right
+#             screen.blit(rotated, carrot.position) 
+#             pygame.display.flip()  # Update the display while shaking 
 
 def flyToBasket():
     pass
@@ -100,24 +98,30 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+            
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE: # mimic carrot movement with space bar
                 # Handle space key press
-                # Find the last visible carrot
-                mainCarrot = next((c for c in reversed(carrots) if c.visible), None)
-                if mainCarrot is not None:
-                    if shakeCounter >= 4:
-                        shakeCounter = 0  # Reset shake counter
-                        # Move the carrot to the basket
-                        print("Flying carrot to basket...")
-                        carrots_in_basket.append(mainCarrot)
-                        basket.update(len(carrots_in_basket))  # Update basket with new carrot count
-                        mainCarrot.visible = False  # Hide the carrot
-                        flyToBasket()
-                    elif shakeCounter < 4:
-                        shakeCounter += 1
-                        print("Shaking carrot...")
-                        shake(mainCarrot, left=True, right=False)  # Example shake left
+                mainCarrot = carrots[-1]
+                if shakeCounter >= 4:
+                    shakeCounter = 0  # Reset shake counter
+                    # Move the carrot to the basket
+                    print("Flying carrot to basket...")
+                      
+                    carrots_in_basket.append(mainCarrot)
+                    basket.update(len(carrots_in_basket))  # Update basket with new carrot count
+                    flyToBasket()
+                    
+                elif shakeCounter < 4 and shakeCounter % 2 == 0:
+                    shakeCounter += 1
+                    print("Shaking carrot...")
+                    mainCarrot.visible = False  # Hide the carrot
+                    mainCarrot.shake(left=True, right=False, screen=screen)  # Example shake left
+                    mainCarrot.visible = True  # Show the carrot again after shaking
+                elif shakeCounter < 4 and shakeCounter % 2 == 1:
+                    shakeCounter += 1
+                    print("Shaking carrot...")
+                    mainCarrot.shake(left=False, right=True, screen=screen)
 
 
     # Draw background first

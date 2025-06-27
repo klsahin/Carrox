@@ -79,17 +79,6 @@ print(f"Carrot positions: {carrot_xs}")
 print(f"Pit positions: {pit_xs}")
 print(f"Basket position: ({basket.position})")
 
-def shake(carrot, left, right):
-    if left:
-        for i in range(10):
-            rotated = pygame.transform.rotate(carrot.image, -i)  # incrementing left
-            screen.blit(rotated, carrot.position)
-            pygame.display.flip()  # Update the display while shaking
-    elif right:
-        for i in range(10):
-            rotated = pygame.transform.rotate(carrot.image, i)  # incrementing right
-            screen.blit(rotated, carrot.position)
-            pygame.display.flip()  # Update the display while shaking
 
 def flyToBasket():
     pass
@@ -133,11 +122,14 @@ while running:
                         new_pit.load_image()
                         carrotPits.insert(0, new_pit)
                         # --- SCROLL LOGIC END (REVERSED) ---
-                    elif shakeCounter < 4:
+                    elif shakeCounter < 4 and shakeCounter % 2 == 0:
                         shakeCounter += 1
                         print("Shaking carrot...")
-                        shake(mainCarrot, left=True, right=False)
-
+                        mainCarrot.shake(left=True, right=False, screen=screen)  # Shake left
+                    elif shakeCounter < 4 and shakeCounter % 2 == 1:
+                        shakeCounter += 1
+                        print("Shaking carrot...")
+                        mainCarrot.shake(left=False, right=True, screen=screen)
 
     # Draw background first
     background.draw(screen)

@@ -1,19 +1,35 @@
 import pygame
 
 class Background:
-    def __init__(self, width, height, image = 'assets/background.png'):
+    def __init__(self, width, height, path = 'assets/background.png'):
         self.position = [0,0]
         self.size = [width, height]
-        self.image = pygame.transform.scale(
-            pygame.image.load(image).convert(), (width, height)
-        )
+        self.imagePath = path
+        self.image = None
 
+    def load_image(self):
+        self.image = pygame.image.load(self.imagePath).convert_alpha()
+        self.image = pygame.transform.scale(self.image, self.size)
+
+
+    
 class Carrot:
-    def __init__(self, x, y, width, height, image): #image = image number!
+    def __init__(self, x, y, width, height, index): #image = image number!
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
         self.position = [x, y]
         self.size = [width, height]
-        path = ["assets/carrot1.png", "assets/carrot2.png", "assets/carrot3.png"][image]
-        self.image = pygame.image.load(path).convert_alpha()  # Load the carrot image
+        self.index = index
+        self.path = f'assets/carrot{index+1}.png'
+        self.image = None  # Placeholder for the image, to be loaded later
+
+    def load_image(self):
+        if self.image is None:
+            self.image = pygame.image.load(self.path).convert_alpha()
+            self.image = pygame.transform.scale(self.image, (self.width, self.height))
+        return self.image
 
     def shake(self, left, right): #left and right are bool ?
         if left:
@@ -22,7 +38,7 @@ class Carrot:
         elif right:
             #twist right
             pass
-
+    
     def flyToBasket(self):
         #fly to basket
         pass
@@ -30,13 +46,20 @@ class Carrot:
     def scroll(self):
         #scroll carrots
         pass
-
+    
 
 class CarrotPit:
-    def __init__(self, x, y, width, height, image = 'assets/carrotpit.png'):
+    def __init__(self, x, y, width, height, path = 'assets/carrotpit.png'):
         self.position = [x, y]
         self.size = [width, height]
-        self.image = pygame.image.load(image).convert_alpha()
+        self.image = None
+        self.imagePath = path
+
+    def load_image(self):
+        if self.image is None:
+            self.image = pygame.image.load(self.imagePath).convert_alpha()
+            self.image = pygame.transform.scale(self.image, self.size)
+        return self.image
 
     def scroll(self):
         #scroll pits

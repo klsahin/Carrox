@@ -16,7 +16,7 @@ background.load_image()  # Load background image
 
 # Adjusted sizes to match the interface
 pit_width, pit_height = 150, 400
-carrot_width, carrot_height = 170, 400  
+carrot_width, carrot_height = 170, 400
 basket_width, basket_height = 250, 650
 
 # Calculate positions for 3 evenly spaced carrots
@@ -49,10 +49,10 @@ for x in pit_xs:
 
 carrots = []
 for i, x in enumerate(carrot_xs):
-    carrot = Carrot(x, carrot_y, carrot_width, carrot_height, i) 
+    carrot = Carrot(x, carrot_y, carrot_width, carrot_height, i)
     carrot.load_image()  # Load carrot image
     carrots.append(carrot)
-               
+
 
 # Basket position (right side, properly spaced)
 
@@ -71,7 +71,10 @@ carrots_in_basket = []
 basket = Basket(basket_x, basket_y, basket_target_width, basket_target_height, 0)
 basket.load_image()  # Load basket image
 
-
+# Load Super Bubble font for carrot count display
+font_path = 'assets/Super Bubble.ttf'
+carrot_font = pygame.font.Font(font_path, 64)  # Adjust size as needed
+carrot_orange = (255, 140, 0)
 
 print(f"Carrot positions: {carrot_xs}")
 print(f"Pit positions: {pit_xs}")
@@ -81,13 +84,13 @@ def shake(carrot, left, right):
     if left:
         for i in range(10):
             rotated = pygame.transform.rotate(carrot.image, -i)  # incrementing left
-            screen.blit(rotated, carrot.position)  
-            pygame.display.flip()  # Update the display while shaking 
+            screen.blit(rotated, carrot.position)
+            pygame.display.flip()  # Update the display while shaking
     elif right:
         for i in range(10):
             rotated = pygame.transform.rotate(carrot.image, i)  # incrementing right
-            screen.blit(rotated, carrot.position) 
-            pygame.display.flip()  # Update the display while shaking 
+            screen.blit(rotated, carrot.position)
+            pygame.display.flip()  # Update the display while shaking
 
 def flyToBasket():
     pass
@@ -100,24 +103,30 @@ while running:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE: # mimic carrot movement with space bar
                 # Handle space key press
-                mainCarrot = carrots[-1]
-                if shakeCounter >= 4:
-                    shakeCounter = 0  # Reset shake counter
-                    # Move the carrot to the basket
-                    print("Flying carrot to basket...")
-                      
-                    carrots_in_basket.append(mainCarrot)
-                    basket.update(len(carrots_in_basket))  # Update basket with new carrot count
-                    flyToBasket()
-                    
-                elif shakeCounter < 4:
-                    shakeCounter += 1
-                    print("Shaking carrot...")
-                    shake(mainCarrot, left=True, right=False)  # Example shake left
-                    
+                # Find the last visible carrot
+                mainCarrot = next((c for c in reversed(carrots) if c.visible), None)
+                if mainCarrot is not None:
+                    if shakeCounter >= 4:
+                        shakeCounter = 0  # Reset shake counter
+                        # Move the carrot to the basket
+                        print("Flying carrot to basket...")
+                        carrots_in_basket.append(mainCarrot)
+                        basket.update(len(carrots_in_basket))  # Update basket with new carrot count
+                        mainCarrot.visible = False  # Hide the carrot
+                        flyToBasket()
+                    elif shakeCounter < 4:
+                        shakeCounter += 1
+                        print("Shaking carrot...")
+                        shake(mainCarrot, left=True, right=False)  # Example shake left
+
 
     # Draw background first
     screen.blit(background.image, background.position)
+
+    # Draw carrot count at top left
+    carrot_count = len(carrots_in_basket)
+    count_text = carrot_font.render(str(carrot_count), True, carrot_orange)
+    screen.blit(count_text, (40, 30))
 
     # Draw pits
     for pit in carrotPits:
@@ -125,7 +134,8 @@ while running:
 
     # Draw carrots
     for carrot in carrots:
-        screen.blit(carrot.image, carrot.position)
+        if carrot.visible:
+            screen.blit(carrot.image, carrot.position)
 
     # Draw basket
     screen.blit(basket.image, basket.position)

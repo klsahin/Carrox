@@ -12,7 +12,7 @@ class Background:
         self.image = pygame.transform.scale(self.image, self.size)
 
 
-    
+
 class Carrot:
     def __init__(self, x, y, width, height, index): #image = image number!
         self.x = x
@@ -24,6 +24,7 @@ class Carrot:
         self.index = index
         self.path = f'assets/carrot{self.index+1}.png'
         self.image = None  # Placeholder for the image, to be loaded later
+        self.visible = True  # Add this line
 
     def load_image(self):
         if self.image is None:
@@ -40,7 +41,7 @@ class Carrot:
     #     elif right:
     #         #twist right
     #         pass
-    
+
     def flyToBasket(self):
         #fly to basket
         pass
@@ -48,7 +49,7 @@ class Carrot:
     def scroll(self):
         #scroll carrots
         pass
-    
+
 
 class CarrotPit:
     def __init__(self, x, y, width, height, path = 'assets/carrotpit.png'):
@@ -65,7 +66,7 @@ class CarrotPit:
     def scroll(self):
         #scroll pits
         pass
-    
+
 
 class Basket():
     def __init__(self, x, y, width, height, index):
@@ -78,7 +79,7 @@ class Basket():
     def load_image(self):
         self.image = pygame.image.load(self.imagePath).convert_alpha()
         self.image = pygame.transform.scale(self.image, self.size)
-    
+
     def update(self, carrot_count):
         if 0 <= carrot_count <= 3:
             self.imagePath = f'assets/{carrot_count}basket.png'

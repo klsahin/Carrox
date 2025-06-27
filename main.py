@@ -1,5 +1,5 @@
 import pygame
-from classes import Carrot, CarrotPit, Background
+from classes import Carrot, CarrotPit, Background, Basket
 
 pygame.init()
 
@@ -17,7 +17,7 @@ background.load_image()  # Load background image
 # Adjusted sizes to match the interface
 pit_width, pit_height = 150, 400
 carrot_width, carrot_height = 170, 400  
-basket_width, basket_height = 250, 250
+basket_width, basket_height = 250, 650
 
 # Calculate positions for 3 evenly spaced carrots
 # Screen width = 1194, leave space for basket on right
@@ -55,24 +55,60 @@ for i, x in enumerate(carrot_xs):
                
 
 # Basket position (right side, properly spaced)
+
 basket_orig_width, basket_orig_height = 846, 1096  # From file info
-basket_target_height = ground_level - 100  # Make basket sit on ground, adjust as needed
+basket_target_height = ground_level - 100  #550 # Make basket sit on ground, adjust as needed
 basket_scale = basket_target_height / basket_orig_height
-basket_target_width = int(basket_orig_width * basket_scale)
+basket_target_width = int(basket_orig_width * basket_scale) #423
 
 basket_img = pygame.image.load('assets/0basket.png').convert_alpha()
 basket_img = pygame.transform.scale(basket_img, (basket_target_width, basket_target_height))
-basket_x = 1194 - basket_target_width - 40  # 40px right margin
-basket_y = ground_level - basket_target_height + 50  # Sit on ground level
+basket_x = 1194 - basket_target_width - 40  # 722 40px right margin
+basket_y = ground_level - basket_target_height - 100  # 150 Sit on ground level
+
+
+basket0 = Basket(basket_x, basket_y, basket_target_width, basket_target_height, 0)
+basket0.load_image()  # Load basket image
 
 print(f"Carrot positions: {carrot_xs}")
 print(f"Pit positions: {pit_xs}")
-print(f"Basket position: ({basket_x}, {basket_y})")
+print(f"Basket position: ({basket0.position})")
 
+# def shake(carrot, left, right):
+#     if left:
+#         for i in range(10):
+#             rotated = pygame.transform.rotate(carrot.image, -i)  # incrementing left
+#             screen.blit(rotated, carrot.position)  
+#             pygame.display.flip()  # Update the display while shaking 
+#     elif right:
+#         for i in range(10):
+#             rotated = pygame.transform.rotate(carrot.image, i)  # incrementing right
+#             screen.blit(rotated, carrot.position) 
+#             pygame.display.flip()  # Update the display while shaking 
+
+def flyToBasket():
+    pass
+
+# Main game loop
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE: # mimic carrot movement with space bar
+                # Handle space key press
+                mainCarrot = carrots[-1]
+                if shakeCounter >= 4:
+                    shakeCounter = 0  # Reset shake counter
+                    # Move the carrot to the basket
+                    print("Flying carrot to basket...")
+                    flyToBasket()  
+
+                elif shakeCounter < 4:
+                    shakeCounter += 1
+                    print("Shaking carrot...")
+                    shake(mainCarrot, left=True, right=False)  # Example shake left
+                    
 
     # Draw background first
     screen.blit(background.image, background.position)
@@ -86,8 +122,10 @@ while running:
         screen.blit(carrot.image, carrot.position)
 
     # Draw basket
-    screen.blit(basket_img, (basket_x, basket_y))
+    screen.blit(basket0.image, basket0.position)
 
     pygame.display.flip()
+
+
 
 pygame.quit()

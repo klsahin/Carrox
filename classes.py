@@ -58,6 +58,8 @@ class Carrot:
         # Hide original carrot during shake
         self.visible = False
 
+        self.size = [self.width * 2, self.height * 1.1]  # Reduce size for shake effect
+        self.position = [self.x - self.width // 2, self.y - self.height // 10]
         shake_frames = [1, 2, 1]
         for i in shake_frames:
             # Redraw the whole scene

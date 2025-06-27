@@ -122,6 +122,8 @@ while running:
                         new_pit.load_image()
                         carrotPits.insert(0, new_pit)
                         # --- SCROLL LOGIC END (REVERSED) ---
+
+                    # shaking logic    
                     elif shakeCounter < 4 and shakeCounter % 2 == 0:
                         shakeCounter += 1
                         print("Shaking carrot...")

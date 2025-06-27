@@ -1,5 +1,6 @@
 import pygame
 from classes import Carrot, CarrotPit, Background, Basket
+import random
 
 pygame.init()
 
@@ -11,7 +12,7 @@ running = True
 mode = 'game'
 
 # Load background
-background = Background(1194, 834)
+background = Background(1194, 834)  # Uses background1.png by default now
 background.load_image()  # Load background image
 
 # Adjusted sizes to match the interface
@@ -102,26 +103,46 @@ while running:
             running = False
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE: # mimic carrot movement with space bar
-                # Handle space key press
                 # Find the last visible carrot
                 mainCarrot = next((c for c in reversed(carrots) if c.visible), None)
                 if mainCarrot is not None:
                     if shakeCounter >= 4:
                         shakeCounter = 0  # Reset shake counter
-                        # Move the carrot to the basket
                         print("Flying carrot to basket...")
                         carrots_in_basket.append(mainCarrot)
-                        basket.update(len(carrots_in_basket))  # Update basket with new carrot count
-                        mainCarrot.visible = False  # Hide the carrot
+                        basket.update(len(carrots_in_basket))
+                        mainCarrot.visible = False
                         flyToBasket()
+                        # --- SCROLL LOGIC START (REVERSED) ---
+                        scroll_dx = carrot_xs[1] - carrot_xs[0]  # Distance between carrots
+                        background.scroll(-scroll_dx)  # Scroll to the right
+                        # Move all carrots and pits right by scroll_dx
+                        for carrot in carrots:
+                            carrot.position[0] += scroll_dx
+                        for pit in carrotPits:
+                            pit.position[0] += scroll_dx
+                        # Remove rightmost carrot and pit
+                        carrots.pop(-1)
+                        carrotPits.pop(-1)
+                        # Add new random carrot and pit on the left
+                        new_x = carrot_xs[0] - scroll_dx
+                        new_index = random.randint(0, 2)
+                        new_carrot = Carrot(new_x, carrot_y, carrot_width, carrot_height, new_index)
+                        new_carrot.load_image()
+                        carrots.insert(0, new_carrot)
+                        new_pit_x = new_x + (carrot_width - pit_width) // 2
+                        new_pit = CarrotPit(new_pit_x, pit_y, pit_width, pit_height)
+                        new_pit.load_image()
+                        carrotPits.insert(0, new_pit)
+                        # --- SCROLL LOGIC END (REVERSED) ---
                     elif shakeCounter < 4:
                         shakeCounter += 1
                         print("Shaking carrot...")
-                        shake(mainCarrot, left=True, right=False)  # Example shake left
+                        shake(mainCarrot, left=True, right=False)
 
 
     # Draw background first
-    screen.blit(background.image, background.position)
+    background.draw(screen)
 
     # Draw carrot count at top left
     carrot_count = len(carrots_in_basket)

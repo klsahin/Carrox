@@ -76,7 +76,12 @@ class Basket():
         self.imagePath = f'assets/{index}basket.png'
 
     def load_image(self):
-        if self.image is None:
-            self.image = pygame.image.load(self.imagePath).convert_alpha()
-            self.image = pygame.transform.scale(self.image, self.size)
-        return self.image
+        self.image = pygame.image.load(self.imagePath).convert_alpha()
+        self.image = pygame.transform.scale(self.image, self.size)
+    
+    def update(self, carrot_count):
+        if 0 <= carrot_count <= 3:
+            self.imagePath = f'assets/{carrot_count}basket.png'
+        elif carrot_count > 3:
+            self.imagePath = 'assets/nbasket.png'  # Use a fixed image for
+        self.load_image()

@@ -64,27 +64,30 @@ basket_target_width = int(basket_orig_width * basket_scale) #423
 basket_img = pygame.image.load('assets/0basket.png').convert_alpha()
 basket_img = pygame.transform.scale(basket_img, (basket_target_width, basket_target_height))
 basket_x = 1194 - basket_target_width - 40  # 722 40px right margin
-basket_y = ground_level - basket_target_height - 100  # 150 Sit on ground level
+basket_y = ground_level - basket_target_height - 100  # Sit on ground level
+
+carrots_in_basket = []
+
+basket = Basket(basket_x, basket_y, basket_target_width, basket_target_height, 0)
+basket.load_image()  # Load basket image
 
 
-basket0 = Basket(basket_x, basket_y, basket_target_width, basket_target_height, 0)
-basket0.load_image()  # Load basket image
 
 print(f"Carrot positions: {carrot_xs}")
 print(f"Pit positions: {pit_xs}")
-print(f"Basket position: ({basket0.position})")
+print(f"Basket position: ({basket.position})")
 
-# def shake(carrot, left, right):
-#     if left:
-#         for i in range(10):
-#             rotated = pygame.transform.rotate(carrot.image, -i)  # incrementing left
-#             screen.blit(rotated, carrot.position)  
-#             pygame.display.flip()  # Update the display while shaking 
-#     elif right:
-#         for i in range(10):
-#             rotated = pygame.transform.rotate(carrot.image, i)  # incrementing right
-#             screen.blit(rotated, carrot.position) 
-#             pygame.display.flip()  # Update the display while shaking 
+def shake(carrot, left, right):
+    if left:
+        for i in range(10):
+            rotated = pygame.transform.rotate(carrot.image, -i)  # incrementing left
+            screen.blit(rotated, carrot.position)  
+            pygame.display.flip()  # Update the display while shaking 
+    elif right:
+        for i in range(10):
+            rotated = pygame.transform.rotate(carrot.image, i)  # incrementing right
+            screen.blit(rotated, carrot.position) 
+            pygame.display.flip()  # Update the display while shaking 
 
 def flyToBasket():
     pass
@@ -102,8 +105,11 @@ while running:
                     shakeCounter = 0  # Reset shake counter
                     # Move the carrot to the basket
                     print("Flying carrot to basket...")
-                    flyToBasket()  
-
+                      
+                    carrots_in_basket.append(mainCarrot)
+                    basket.update(len(carrots_in_basket))  # Update basket with new carrot count
+                    flyToBasket()
+                    
                 elif shakeCounter < 4:
                     shakeCounter += 1
                     print("Shaking carrot...")
@@ -122,7 +128,7 @@ while running:
         screen.blit(carrot.image, carrot.position)
 
     # Draw basket
-    screen.blit(basket0.image, basket0.position)
+    screen.blit(basket.image, basket.position)
 
     pygame.display.flip()
 

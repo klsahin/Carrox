@@ -54,13 +54,11 @@ class Carrot:
         original_path = self.path
         original_size = self.size
         original_position = self.position
-        # Hide original carrot during shake
-        self.visible = False
+        
+        self.visible = False # Hide original carrot during shake
 
-        self.size = [self.width * 2, self.height * 1.1]  # Reduce size for shake effect
-        #self.position = [self.x - self.width // 2, self.y - self.height // 10]
+        self.size = [self.width * 2, self.height * 1.1]  # Adjusting size for shake effect
         self.position = [self.position[0] - self.width // 2, self.position[1] - self.height // 10]
-        print(f"Shaking carrot at {self.position} with size {self.size}")
 
         shake_frames = [1, 2, 1]
         for i in shake_frames:
@@ -80,7 +78,7 @@ class Carrot:
                 self.path = f'assets/carrotShakes/carrotR{i}.png'
             self.load_image()
             screen.blit(self.image, self.position)
-            pygame.display.flip()
+            pygame.display.flip() #update the display
             pygame.time.wait(200)
 
         # Restore carrot state

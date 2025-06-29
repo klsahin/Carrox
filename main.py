@@ -83,6 +83,23 @@ print(f"Basket position: ({basket.position})")
 def flyToBasket():
     pass
 
+
+def drawObjects():
+    # Draw background first
+    background.draw(screen)
+    
+    # Draw pits
+    for pit in carrotPits:
+        screen.blit(pit.image, pit.position)
+
+    # Draw carrots
+    for carrot in carrots:
+        if carrot.visible:
+            screen.blit(carrot.image, carrot.position)
+
+    # Draw basket
+    screen.blit(basket.image, basket.position)
+
 # Main game loop
 while running:
     for event in pygame.event.get():
@@ -102,16 +119,24 @@ while running:
                         flyToBasket()
 
                         # --- SCROLL LOGIC START (REVERSED) ---
-                        scroll_dx = carrot_xs[1] - carrot_xs[0]  # Distance between carrots
-                        background.scroll(-scroll_dx)  # Scroll to the right
-                        # Move all carrots and pits right by scroll_dx
-                        for carrot in carrots:
-                            carrot.position[0] += scroll_dx
-                        for pit in carrotPits:
-                            pit.position[0] += scroll_dx
-
                         # Remove rightmost carrot only, not the pit
                         carrots.pop(-1)
+
+
+                        scroll_dx = carrot_xs[1] - carrot_xs[0]  # Distance between carrots
+                        for i in range(10):
+                            background.scroll(-scroll_dx//10)  # Scroll to the right
+                            # Move all carrots and pits right by scroll_dx
+                            for carrot in carrots:
+                                carrot.position[0] += scroll_dx//10
+                            for pit in carrotPits:
+                                pit.position[0] += scroll_dx//10
+                            drawObjects()
+                            pygame.display.flip()
+                            pygame.time.delay(50)
+
+
+                        
                         # Remove rightmost pit only if it is off the screen
                         if carrotPits[-1].position[0] > screen.get_width():
                             carrotPits.pop(-1)
@@ -140,28 +165,18 @@ while running:
                         print("Shaking carrot...")
                         mainCarrot.shake(left=False, right=True, screen=screen, background=background, carrotPits=carrotPits, carrots=carrots, basket=basket)
 
-    # Draw background first
-    background.draw(screen)
+    
 
     # Draw carrot count at top left
     carrot_count = len(carrots_in_basket)
     count_text = carrot_font.render(str(carrot_count), True, carrot_orange)
     screen.blit(count_text, (40, 30))
 
-    # Draw pits
-    for pit in carrotPits:
-        screen.blit(pit.image, pit.position)
-
-    # Draw carrots
-    for carrot in carrots:
-        if carrot.visible:
-            screen.blit(carrot.image, carrot.position)
-
-    # Draw basket
-    screen.blit(basket.image, basket.position)
+    drawObjects()
 
     pygame.display.flip()
 
 
 
 pygame.quit()
+

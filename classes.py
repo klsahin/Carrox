@@ -50,7 +50,7 @@ class Carrot:
 
 
 
-    def shake(self, left, right, screen, background, carrotPits, carrots, basket):
+    def shake(self, left, right, screen, background, carrotPits, carrots, basket, drawObjects):
         original_path = self.path
         original_size = self.size
         original_position = self.position
@@ -63,13 +63,14 @@ class Carrot:
         shake_frames = [1, 2, 1]
         for i in shake_frames:
             # Redraw the whole scene
-            background.draw(screen)
-            for pit in carrotPits:
-                screen.blit(pit.image, pit.position)
-            for carrot in carrots:
-                if carrot.visible:
-                    screen.blit(carrot.image, carrot.position)
-            screen.blit(basket.image, basket.position)
+            drawObjects()  # Call the function to draw all objects
+            # background.draw(screen)
+            # for pit in carrotPits:
+            #     screen.blit(pit.image, pit.position)
+            # for carrot in carrots:
+            #     if carrot.visible:
+            #         screen.blit(carrot.image, carrot.position)
+            # screen.blit(basket.image, basket.position)
 
             # Draw the shake frame in place of the original carrot
             if left:

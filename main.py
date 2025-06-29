@@ -100,6 +100,11 @@ def drawObjects():
     # Draw basket
     screen.blit(basket.image, basket.position)
 
+    # Draw carrot count at top left
+    carrot_count = len(carrots_in_basket)
+    count_text = carrot_font.render(str(carrot_count), True, carrot_orange)
+    screen.blit(count_text, (40, 30))
+
 # Main game loop
 while running:
     for event in pygame.event.get():
@@ -159,20 +164,18 @@ while running:
                     elif shakeCounter < 4 and shakeCounter % 2 == 0:
                         shakeCounter += 1
                         print("Shaking carrot...")
-                        mainCarrot.shake(left=True, right=False, screen=screen, background=background, carrotPits=carrotPits, carrots=carrots, basket=basket)  # Shake left
+                        mainCarrot.shake(left=True, right=False, screen=screen, background=background, carrotPits=carrotPits, carrots=carrots, basket=basket, drawObjects=drawObjects)  # Shake left
                     elif shakeCounter < 4 and shakeCounter % 2 == 1:
                         shakeCounter += 1
                         print("Shaking carrot...")
-                        mainCarrot.shake(left=False, right=True, screen=screen, background=background, carrotPits=carrotPits, carrots=carrots, basket=basket)
+                        mainCarrot.shake(left=False, right=True, screen=screen, background=background, carrotPits=carrotPits, carrots=carrots, basket=basket, drawObjects=drawObjects)
 
     
-
-    # Draw carrot count at top left
-    carrot_count = len(carrots_in_basket)
-    count_text = carrot_font.render(str(carrot_count), True, carrot_orange)
-    screen.blit(count_text, (40, 30))
-
     drawObjects()
+    
+    
+
+    
 
     pygame.display.flip()
 

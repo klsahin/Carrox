@@ -114,38 +114,14 @@ class Carrot:
         end_y = basket.position[1] + basket.size[1] // 2 - self.size[1] // 2
         original_size = self.size.copy()
 
-        # --- PHASE 1: Pull carrot up from soil ---
-        pull_up_distance = 120  # How far to pull up (pixels)
-        pull_up_frames = 18
-        for frame in range(pull_up_frames):
-            t = frame / (pull_up_frames - 1)
-            y = start_y - pull_up_distance * t
-            # Redraw scene
-            background.draw(screen)
-            count_text = carrot_font.render(str(carrot_count), True, carrot_orange)
-            screen.blit(count_text, (40, 30))
-            for pit in carrotPits:
-                screen.blit(pit.image, pit.position)
-            for carrot in carrots:
-                if carrot.visible and carrot is not self:
-                    screen.blit(carrot.image, carrot.position)
-            screen.blit(basket.image, basket.position)
-            # Draw the carrot being pulled up
-            screen.blit(self.image, (start_x, y))
-            pygame.display.flip()
-            pygame.time.wait(18)
-        # New start position for arc
-        arc_start_x = start_x
-        arc_start_y = start_y - pull_up_distance
-
-        # --- PHASE 2: Fly in arc and spin into basket ---
+        # --- PHASE 2: Fly in arc and spin into basket (no pull up phase) ---
         arc_frames = 30
         for frame in range(arc_frames):
             t = frame / (arc_frames - 1)
             # Arc path: linear x, arc y
-            x = arc_start_x + (end_x - arc_start_x) * t
+            x = start_x + (end_x - start_x) * t
             arc_height = -80  # how high the arc goes (negative is up)
-            y = arc_start_y + (end_y - arc_start_y) * t + arc_height * math.sin(math.pi * t)
+            y = start_y + (end_y - start_y) * t + arc_height * math.sin(math.pi * t)
             # Spin angle
             angle = -360 * t
             # Rotate the carrot image

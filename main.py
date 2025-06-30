@@ -2,6 +2,39 @@ import pygame
 from classes import Carrot, CarrotPit, Background, Basket
 import random
 
+import serial
+import serial.tools.list_ports
+import time
+import csv
+
+# Identify the correct port
+ports = serial.tools.list_ports.comports()
+for port in ports: print(port.device, port.name)
+
+# Create CSV file
+f = open("data.csv","w",newline='')
+f.truncate()
+
+# Open the serial com
+serialCom = serial.Serial('/dev/cu.usbserial-110',115200)
+
+# Toggle DTR to reset the Arduino
+serialCom.setDTR(False)
+time.sleep(1)
+serialCom.flushInput()
+serialCom.setDTR(True)
+
+# How many data points to record
+kmax = 150
+
+# Loop through and collect data as it is available
+dataVariable = 0
+    
+
+
+
+
+
 pygame.init()
 
 screen = pygame.display.set_mode((1194, 834))
@@ -91,6 +124,8 @@ pending_new_pit = None
 def flyToBasket():
     pass
 
+lastDirection = None
+
 
 def drawObjects():
     # Draw background first
@@ -118,38 +153,77 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE and not scrolling: # mimic carrot movement with space bar
-                # Find the last visible carrot
-                mainCarrot = next((c for c in reversed(carrots) if c.visible), None)
-                if mainCarrot is not None:
-                    if shakeCounter >= 4:
-                        shakeCounter = 0  # Reset shake counter
-                        print("Flying carrot to basket...")
-                        carrots_in_basket.append(mainCarrot)
-                        mainCarrot.flyToBasket(screen, background, carrotPits, carrots, basket, len(carrots_in_basket), carrot_font, carrot_orange)
-                        basket.update(len(carrots_in_basket))
-                        # --- SMOOTH SCROLL LOGIC START ---
-                        scrolling = True
-                        scroll_remaining = scroll_dx
-                        # Prepare new carrot and pit to add after scroll
-                        new_x = carrot_xs[0]
-                        new_index = random.randint(0, 2)
-                        pending_new_carrot = Carrot(new_x, carrot_y, carrot_width, carrot_height, new_index)
-                        pending_new_carrot.load_image()
-                        new_pit_x = new_x + (carrot_width - pit_width) // 2
-                        pending_new_pit = CarrotPit(new_pit_x, pit_y, pit_width, pit_height)
-                        pending_new_pit.load_image()
-                        # --- SMOOTH SCROLL LOGIC END ---
-                    elif shakeCounter < 4 and shakeCounter % 2 == 0:
-                        shakeCounter += 1
-                        print("Shaking carrot...")
-                        mainCarrot.shake(left=True, right=False, screen=screen, background=background, carrotPits=carrotPits, carrots=carrots, basket=basket, carrot_count=len(carrots_in_basket), carrot_font=carrot_font, carrot_orange=carrot_orange)  # Shake left
-                    elif shakeCounter < 4 and shakeCounter % 2 == 1:
-                        shakeCounter += 1
-                        print("Shaking carrot...")
-                        mainCarrot.shake(left=False, right=True, screen=screen, background=background, carrotPits=carrotPits, carrots=carrots, basket=basket, carrot_count=len(carrots_in_basket), carrot_font=carrot_font, carrot_orange=carrot_orange)
+        
+    # Find the last visible carrot
+    mainCarrot = next((c for c in reversed(carrots) if c.visible), None)
+    if mainCarrot is not None:
+        if shakeCounter >= 4 and lastDirection == 'right':
+            shakeCounter = 0  # Reset shake counter
+            print("Flying carrot to basket...")
+            carrots_in_basket.append(mainCarrot)
+            mainCarrot.flyToBasket(screen, background, carrotPits, carrots, basket, len(carrots_in_basket), carrot_font, carrot_orange)
+            basket.update(len(carrots_in_basket))
+            # --- SMOOTH SCROLL LOGIC START ---
+            scrolling = True
+            scroll_remaining = scroll_dx
+            # Prepare new carrot and pit to add after scroll
+            new_x = carrot_xs[0]
+            new_index = random.randint(0, 2)
+            pending_new_carrot = Carrot(new_x, carrot_y, carrot_width, carrot_height, new_index)
+            pending_new_carrot.load_image()
+            new_pit_x = new_x + (carrot_width - pit_width) // 2
+            pending_new_pit = CarrotPit(new_pit_x, pit_y, pit_width, pit_height)
+            pending_new_pit.load_image()
+                        
+        else: 
+            try:
+                # Read the line
+                s_bytes = serialCom.readline()
+                decoded_bytes = s_bytes.decode("utf-8").strip('\r\n')
+                print(f"decoded bytes: {decoded_bytes}")
+                leftData = []
+                rightData = []
+                count = 0
+                # Split the data by commas and store in leftData and rightData
+                for data in decoded_bytes.split(","):
+                    leftData.append(data) if count < 4 else rightData.append(data)
+                    count += 1
+                
+                shakeLeft = True
+                shakeRight = True
+                for left in leftData:
+                    if int(left) < 1000:
+                        shakeLeft = False
+                for right in rightData:
+                    if int(right) < 1000:
+                        shakeRight = False
 
+                if shakeLeft:
+                    shakeCounter += 1
+                    print("Shaking carrot...")
+                    mainCarrot.shake(left=True, right=False, screen=screen, background=background, carrotPits=carrotPits, carrots=carrots, basket=basket, carrot_count=len(carrots_in_basket), carrot_font=carrot_font, carrot_orange=carrot_orange)  # Shake left
+                    lastDirection = 'left'
+                if shakeRight:
+                    shakeCounter += 1
+                    print("Shaking carrot...")
+                    mainCarrot.shake(left=False, right=True, screen=screen, background=background, carrotPits=carrotPits, carrots=carrots, basket=basket, carrot_count=len(carrots_in_basket), carrot_font=carrot_font, carrot_orange=carrot_orange)  # Shake right
+                    lastDirection = 'right'
+                    
+                print('reading line:', dataVariable+1)
+                # Parse the line
+                values = decoded_bytes.split(",")
+                print(f"values: {values}")
+
+                # Write to CSV
+                writer = csv.writer(f,delimiter=",")
+                writer.writerow(values)
+
+            except:
+                print("Error encountered, line was not recorded.")
+
+            dataVariable += 1
+            pygame.time.delay(100)  # Delay to avoid overwhelming the serial port
+                    
     # --- SMOOTH SCROLL ANIMATION ---
     if scrolling:
         move = min(scroll_speed, scroll_remaining)
@@ -181,6 +255,7 @@ while running:
 
     pygame.display.flip()
 
+    
 
-
+f.close()
 pygame.quit()

@@ -178,7 +178,7 @@ class CarrotPit:
         pass
 
 
-class Basket():
+class Basket:
     def __init__(self, x, y, width, height, index):
         self.position = [x+18, y+65]
         self.size = [width*0.9, height*0.9]

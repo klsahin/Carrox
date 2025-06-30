@@ -130,40 +130,11 @@ while running:
                         basket.update(len(carrots_in_basket))
                         mainCarrot.visible = False
                         flyToBasket()
-<<<<<<< HEAD
-
-                        # --- SCROLL LOGIC START (REVERSED) ---
-                        # Remove rightmost carrot only, not the pit
-                        carrots.pop(-1)
-
-
-                        scroll_dx = carrot_xs[1] - carrot_xs[0]  # Distance between carrots
-                        for i in range(10):
-                            background.scroll(-scroll_dx//10)  # Scroll to the right
-                            # Move all carrots and pits right by scroll_dx
-                            for carrot in carrots:
-                                carrot.position[0] += scroll_dx//10
-                            for pit in carrotPits:
-                                pit.position[0] += scroll_dx//10
-                            drawObjects()
-                            pygame.display.flip()
-                            pygame.time.delay(50)
-
-
-                        
-                        # Remove rightmost pit only if it is off the screen
-                        if carrotPits[-1].position[0] > screen.get_width():
-                            carrotPits.pop(-1)
-
-                        # Add new random carrot and pit on the left
-                        new_x = carrot_xs[0] 
-=======
                         # --- SMOOTH SCROLL LOGIC START ---
                         scrolling = True
                         scroll_remaining = scroll_dx
                         # Prepare new carrot and pit to add after scroll
-                        new_x = carrot_xs[0] - scroll_dx
->>>>>>> 16acbda (unroot carrot)
+                        new_x = carrot_xs[0]
                         new_index = random.randint(0, 2)
                         pending_new_carrot = Carrot(new_x, carrot_y, carrot_width, carrot_height, new_index)
                         pending_new_carrot.load_image()
@@ -174,13 +145,6 @@ while running:
                     elif shakeCounter < 4 and shakeCounter % 2 == 0:
                         shakeCounter += 1
                         print("Shaking carrot...")
-<<<<<<< HEAD
-                        mainCarrot.shake(left=True, right=False, screen=screen, background=background, carrotPits=carrotPits, carrots=carrots, basket=basket, drawObjects=drawObjects)  # Shake left
-                    elif shakeCounter < 4 and shakeCounter % 2 == 1:
-                        shakeCounter += 1
-                        print("Shaking carrot...")
-                        mainCarrot.shake(left=False, right=True, screen=screen, background=background, carrotPits=carrotPits, carrots=carrots, basket=basket, drawObjects=drawObjects)
-=======
                         mainCarrot.shake(left=True, right=False, screen=screen, background=background, carrotPits=carrotPits, carrots=carrots, basket=basket, carrot_count=len(carrots_in_basket), carrot_font=carrot_font, carrot_orange=carrot_orange)  # Shake left
                     elif shakeCounter < 4 and shakeCounter % 2 == 1:
                         shakeCounter += 1
@@ -208,7 +172,6 @@ while running:
             pending_new_carrot = None
             pending_new_pit = None
             scrolling = False
->>>>>>> 16acbda (unroot carrot)
 
     
     drawObjects()

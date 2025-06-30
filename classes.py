@@ -43,7 +43,7 @@ class Carrot:
         self.index = index
         self.path = f'assets/carrot{self.index+1}.png'
         self.image = None  # Placeholder for the image, to be loaded later
-        self.visible = True  # Add this line
+        self.visible = True
         # Unrooting state
         self.unroot_level = 0
         self.max_unroot_level = 3  # Number of shakes to fully unroot (tweak as needed)
@@ -72,7 +72,7 @@ class Carrot:
         else:
             shake_frames = []
 
-        unroot_step = 18  # Amount to move up per shake frame (tweak as needed)
+        unroot_step = 22  # Amount to move up per shake frame (tweak as needed)
         for frame_idx, frame_name in enumerate(shake_frames):
             # Redraw the whole scene
             background.draw(screen)

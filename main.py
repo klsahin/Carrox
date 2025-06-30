@@ -121,8 +121,6 @@ scroll_speed = 20  # Pixels per frame (adjust for smoothness)
 pending_new_carrot = None
 pending_new_pit = None
 
-def flyToBasket():
-    pass
 
 lastDirection = None
 
@@ -159,6 +157,7 @@ while running:
     if mainCarrot is not None:
         if shakeCounter >= 4 and lastDirection == 'right':
             shakeCounter = 0  # Reset shake counter
+            leftData = rightData = []
             print("Flying carrot to basket...")
             carrots_in_basket.append(mainCarrot)
             mainCarrot.flyToBasket(screen, background, carrotPits, carrots, basket, len(carrots_in_basket), carrot_font, carrot_orange)
@@ -178,12 +177,15 @@ while running:
         else: 
             try:
                 # Read the line
+                serialCom.flushInput() #clear serial input
+
                 s_bytes = serialCom.readline()
                 decoded_bytes = s_bytes.decode("utf-8").strip('\r\n')
                 print(f"decoded bytes: {decoded_bytes}")
                 leftData = []
                 rightData = []
                 count = 0
+
                 # Split the data by commas and store in leftData and rightData
                 for data in decoded_bytes.split(","):
                     leftData.append(data) if count < 4 else rightData.append(data)
@@ -203,12 +205,14 @@ while running:
                     print("Shaking carrot...")
                     mainCarrot.shake(left=True, right=False, screen=screen, background=background, carrotPits=carrotPits, carrots=carrots, basket=basket, carrot_count=len(carrots_in_basket), carrot_font=carrot_font, carrot_orange=carrot_orange)  # Shake left
                     lastDirection = 'left'
+                    pygame.time.delay(200)
                 if shakeRight:
                     shakeCounter += 1
                     print("Shaking carrot...")
                     mainCarrot.shake(left=False, right=True, screen=screen, background=background, carrotPits=carrotPits, carrots=carrots, basket=basket, carrot_count=len(carrots_in_basket), carrot_font=carrot_font, carrot_orange=carrot_orange)  # Shake right
                     lastDirection = 'right'
-                    
+                    pygame.time.delay(200)
+
                 print('reading line:', dataVariable+1)
                 # Parse the line
                 values = decoded_bytes.split(",")
@@ -222,7 +226,7 @@ while running:
                 print("Error encountered, line was not recorded.")
 
             dataVariable += 1
-            pygame.time.delay(100)  # Delay to avoid overwhelming the serial port
+              # Delay to avoid overwhelming the serial port
                     
     # --- SMOOTH SCROLL ANIMATION ---
     if scrolling:

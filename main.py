@@ -7,6 +7,7 @@ import serial.tools.list_ports
 import time
 import csv
 
+
 # Identify the correct port
 ports = serial.tools.list_ports.comports()
 for port in ports: print(port.device, port.name)
@@ -131,11 +132,12 @@ def drawObjects():
 
     # Draw pits
     for pit in carrotPits:
-        screen.blit(pit.image, pit.position)
+        if pit is not None and pit.image is not None:
+            screen.blit(pit.image, pit.position)
 
     # Draw carrots
     for carrot in carrots:
-        if carrot.visible:
+        if carrot is not None and carrot.image is not None and carrot.visible:
             screen.blit(carrot.image, carrot.position)
 
     # Draw basket
@@ -163,16 +165,23 @@ while running:
             mainCarrot.flyToBasket(screen, background, carrotPits, carrots, basket, len(carrots_in_basket), carrot_font, carrot_orange)
             basket.update(len(carrots_in_basket))
             # --- SMOOTH SCROLL LOGIC START ---
+            # Generate new carrot and pit just off-screen to the left
+            new_carrot_x = carrot_xs[0] - scroll_dx
+            new_index = random.randint(0, 2)
+            new_carrot = Carrot(new_carrot_x, carrot_y, carrot_width, carrot_height, new_index)
+            new_carrot.load_image()
+
+            new_pit_x = new_carrot_x + (carrot_width - pit_width) // 2
+            new_pit = CarrotPit(new_pit_x, pit_y, pit_width, pit_height)
+            new_pit.load_image()
+
+            # Insert at the beginning of the lists
+            carrots.insert(0, new_carrot)
+            carrotPits.insert(0, new_pit)
+
+            # Start scrolling
             scrolling = True
             scroll_remaining = scroll_dx
-            # Prepare new carrot and pit to add after scroll
-            new_x = carrot_xs[0]
-            new_index = random.randint(0, 2)
-            pending_new_carrot = Carrot(new_x, carrot_y, carrot_width, carrot_height, new_index)
-            pending_new_carrot.load_image()
-            new_pit_x = new_x + (carrot_width - pit_width) // 2
-            pending_new_pit = CarrotPit(new_pit_x, pit_y, pit_width, pit_height)
-            pending_new_pit.load_image()
                         
         else: 
             try:
@@ -213,10 +222,10 @@ while running:
                     lastDirection = 'right'
                     pygame.time.delay(200)
 
-                print('reading line:', dataVariable+1)
+                #print('reading line:', dataVariable+1)
                 # Parse the line
                 values = decoded_bytes.split(",")
-                print(f"values: {values}")
+                #print(f"values: {values}")
 
                 # Write to CSV
                 writer = csv.writer(f,delimiter=",")
@@ -227,7 +236,10 @@ while running:
 
             dataVariable += 1
               # Delay to avoid overwhelming the serial port
-                    
+
+    drawObjects()
+
+
     # --- SMOOTH SCROLL ANIMATION ---
     if scrolling:
         move = min(scroll_speed, scroll_remaining)
@@ -243,15 +255,10 @@ while running:
             # Remove rightmost pit only if it is off the screen
             if carrotPits[-1].position[0] > screen.get_width():
                 carrotPits.pop(-1)
-            # Add new random carrot and pit on the left
-            carrots.insert(0, pending_new_carrot)
-            carrotPits.insert(0, pending_new_pit)
-            pending_new_carrot = None
-            pending_new_pit = None
+            
             scrolling = False
 
 
-    drawObjects()
 
 
 

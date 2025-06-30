@@ -29,7 +29,7 @@ kmax = 150
 
 # Loop through and collect data as it is available
 dataVariable = 0
-
+    
 
 
 
@@ -151,7 +151,7 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-
+        
     # Find the last visible carrot
     mainCarrot = next((c for c in reversed(carrots) if c.visible), None)
     if mainCarrot is not None:
@@ -163,7 +163,9 @@ while running:
             mainCarrot.flyToBasket(screen, background, carrotPits, carrots, basket, len(carrots_in_basket), carrot_font, carrot_orange)
             basket.update(len(carrots_in_basket))
             # --- SMOOTH SCROLL LOGIC START ---
-            # Prepare new carrot and pit to add before scroll
+            scrolling = True
+            scroll_remaining = scroll_dx
+            # Prepare new carrot and pit to add after scroll
             new_x = carrot_xs[0]
             new_index = random.randint(0, 2)
             pending_new_carrot = Carrot(new_x, carrot_y, carrot_width, carrot_height, new_index)
@@ -171,13 +173,8 @@ while running:
             new_pit_x = new_x + (carrot_width - pit_width) // 2
             pending_new_pit = CarrotPit(new_pit_x, pit_y, pit_width, pit_height)
             pending_new_pit.load_image()
-            # Insert at the leftmost position so they scroll in
-            carrots.insert(0, pending_new_carrot)
-            carrotPits.insert(0, pending_new_pit)
-            scrolling = True
-            scroll_remaining = scroll_dx
-
-        else:
+                        
+        else: 
             try:
                 # Read the line
                 serialCom.flushInput() #clear serial input
@@ -193,7 +190,7 @@ while running:
                 for data in decoded_bytes.split(","):
                     leftData.append(data) if count < 4 else rightData.append(data)
                     count += 1
-
+                
                 shakeLeft = True
                 shakeRight = True
                 for left in leftData:
@@ -230,7 +227,7 @@ while running:
 
             dataVariable += 1
               # Delay to avoid overwhelming the serial port
-
+                    
     # --- SMOOTH SCROLL ANIMATION ---
     if scrolling:
         move = min(scroll_speed, scroll_remaining)
@@ -246,6 +243,11 @@ while running:
             # Remove rightmost pit only if it is off the screen
             if carrotPits[-1].position[0] > screen.get_width():
                 carrotPits.pop(-1)
+            # Add new random carrot and pit on the left
+            carrots.insert(0, pending_new_carrot)
+            carrotPits.insert(0, pending_new_pit)
+            pending_new_carrot = None
+            pending_new_pit = None
             scrolling = False
 
 
@@ -257,7 +259,7 @@ while running:
 
     pygame.display.flip()
 
-
+    
 
 f.close()
 pygame.quit()

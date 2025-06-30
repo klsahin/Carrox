@@ -95,7 +95,7 @@ def flyToBasket():
 def drawObjects():
     # Draw background first
     background.draw(screen)
-    
+
     # Draw pits
     for pit in carrotPits:
         screen.blit(pit.image, pit.position)
@@ -127,9 +127,8 @@ while running:
                         shakeCounter = 0  # Reset shake counter
                         print("Flying carrot to basket...")
                         carrots_in_basket.append(mainCarrot)
+                        mainCarrot.flyToBasket(screen, background, carrotPits, carrots, basket, len(carrots_in_basket), carrot_font, carrot_orange)
                         basket.update(len(carrots_in_basket))
-                        mainCarrot.visible = False
-                        flyToBasket()
                         # --- SMOOTH SCROLL LOGIC START ---
                         scrolling = True
                         scroll_remaining = scroll_dx
@@ -173,16 +172,15 @@ while running:
             pending_new_pit = None
             scrolling = False
 
-    
-    drawObjects()
-    
-    
 
-    
+    drawObjects()
+
+
+
+
 
     pygame.display.flip()
 
 
 
 pygame.quit()
-

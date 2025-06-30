@@ -1,4 +1,5 @@
 import pygame
+import math
 
 class Background:
     def __init__(self, width, height, path='assets/background1.png', path2='assets/background2.png'):
@@ -43,6 +44,9 @@ class Carrot:
         self.path = f'assets/carrot{self.index+1}.png'
         self.image = None  # Placeholder for the image, to be loaded later
         self.visible = True  # Add this line
+        # Unrooting state
+        self.unroot_level = 0
+        self.max_unroot_level = 3  # Number of shakes to fully unroot (tweak as needed)
 
     def load_image(self):
         self.image = pygame.image.load(self.path).convert_alpha()
@@ -50,29 +54,36 @@ class Carrot:
 
 
 
-    def shake(self, left, right, screen, background, carrotPits, carrots, basket, drawObjects):
+    def shake(self, left, right, screen, background, carrotPits, carrots, basket, carrot_count, carrot_font, carrot_orange, fly_after_shake=False):
         original_path = self.path
         original_size = self.size
         original_position = self.position
-        
+
         self.visible = False # Hide original carrot during shake
 
         self.size = [self.width * 2, self.height * 1.1]  # Adjusting size for shake effect
         self.position = [self.position[0] - self.width // 2, self.position[1] - self.height // 10]
 
         shake_frames = [1, 2, 1]
-        for i in shake_frames:
+        unroot_step = 18  # Amount to move up per shake frame (tweak as needed)
+        for frame_idx, i in enumerate(shake_frames):
             # Redraw the whole scene
-            drawObjects()  # Call the function to draw all objects
-            # background.draw(screen)
-            # for pit in carrotPits:
-            #     screen.blit(pit.image, pit.position)
-            # for carrot in carrots:
-            #     if carrot.visible:
-            #         screen.blit(carrot.image, carrot.position)
-            # screen.blit(basket.image, basket.position)
+            background.draw(screen)
+            count_text = carrot_font.render(str(carrot_count), True, carrot_orange)
+            screen.blit(count_text, (40, 30))
+            for pit in carrotPits:
+                screen.blit(pit.image, pit.position)
+            for carrot in carrots:
+                if carrot.visible:
+                    screen.blit(carrot.image, carrot.position)
+            screen.blit(basket.image, basket.position)
 
-            # Draw the shake frame in place of the original carrot
+            # Move carrot up by unroot_step * frame_idx
+            shake_position = [self.position[0], self.position[1] - unroot_step * frame_idx]
+            screen.blit(self.image, shake_position)
+            pygame.display.flip()
+
+            # Draw the shake frame in place of the original carrot, moving it up per frame
             if left:
                 self.path = f'assets/carrotShakes/carrotL{i}.png'
             elif right:
@@ -82,20 +93,72 @@ class Carrot:
             pygame.display.flip() #update the display
             pygame.time.wait(200)
 
-        # Restore carrot state
+        # Restore carrot state, but keep it unrooted (higher y)
         self.path = original_path
         self.size = original_size
-        self.position = original_position
+        # Only restore x, keep y unrooted
+        total_unroot = unroot_step * (len(shake_frames) - 1)
+        self.position = [original_position[0], original_position[1] - total_unroot]
         self.visible = True
         self.load_image()
 
-    def flyToBasket(self):
-        #fly to basket
-        pass
+        # Trigger the fly-to-basket animation only if requested
+        if fly_after_shake:
+            self.flyToBasket(screen, background, carrotPits, carrots, basket, carrot_count, carrot_font, carrot_orange)
+
+    def flyToBasket(self, screen, background, carrotPits, carrots, basket, carrot_count, carrot_font, carrot_orange):
+        # Start and end positions
+        start_x, start_y = self.position
+        end_x = basket.position[0] + basket.size[0] // 2 - self.size[0] // 2
+        end_y = basket.position[1] + basket.size[1] // 2 - self.size[1] // 2
+        frames = 30
+        original_size = self.size.copy()
+
+        for frame in range(frames):
+            t = frame / (frames - 1)
+            # Arc path: linear x, arc y
+            x = start_x + (end_x - start_x) * t
+            # Use a sine arc for y
+            arc_height = -80  # how high the arc goes (negative is up)
+            y = start_y + (end_y - start_y) * t + arc_height * math.sin(math.pi * t)
+            # Shrink size
+            scale = 1 - 0.7 * t  # shrinks to 30% of original size
+            new_size = [int(original_size[0] * scale), int(original_size[1] * scale)]
+            # Center the carrot as it shrinks
+            draw_x = int(x + (original_size[0] - new_size[0]) / 2)
+            draw_y = int(y + (original_size[1] - new_size[1]) / 2)
+
+            # Redraw scene
+            background.draw(screen)
+            count_text = carrot_font.render(str(carrot_count), True, carrot_orange)
+            screen.blit(count_text, (40, 30))
+            for pit in carrotPits:
+                screen.blit(pit.image, pit.position)
+            for carrot in carrots:
+                if carrot.visible and carrot is not self:
+                    screen.blit(carrot.image, carrot.position)
+            screen.blit(basket.image, basket.position)
+
+            # Draw the flying carrot
+            temp_image = pygame.transform.scale(self.image, new_size)
+            screen.blit(temp_image, (draw_x, draw_y))
+            pygame.display.flip()
+            pygame.time.wait(20)
+
+        # After animation, hide the carrot
+        self.visible = False
 
     def scroll(self):
         #scroll carrots
         pass
+
+    def unroot_and_maybe_fly(self, left, right, screen, background, carrotPits, carrots, basket, carrot_count, carrot_font, carrot_orange):
+        self.unroot_level += 1
+        if self.unroot_level >= self.max_unroot_level:
+            self.shake(left, right, screen, background, carrotPits, carrots, basket, carrot_count, carrot_font, carrot_orange, fly_after_shake=True)
+            self.unroot_level = 0  # Reset for next time
+        else:
+            self.shake(left, right, screen, background, carrotPits, carrots, basket, carrot_count, carrot_font, carrot_orange, fly_after_shake=False)
 
 
 class CarrotPit:
@@ -117,7 +180,7 @@ class CarrotPit:
 
 class Basket():
     def __init__(self, x, y, width, height, index):
-        self.position = [x+10, y+70]
+        self.position = [x+18, y+65]
         self.size = [width*0.9, height*0.9]
         self.image = None
         self.index = index

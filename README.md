@@ -31,5 +31,6 @@ To use with Arduino hardware:
   ```
   python main.py
   ```
-
+## Credits
+Made by Dingning Cao and Karla Sahin for Mingming Li and Jiaji Li :D
 
